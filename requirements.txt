@@ -1,0 +1,10 @@
+numpy==1.16.4
+Pillow==6.0.0
+pkg-resources==0.0.0
+python-Levenshtein==0.12.0
+-e git+git@github.com:gchrupala/rascal.git@3b4f1a9490ed72194d5852eb0a16a6a869b02dda#egg=rascal
+scikit-learn==0.20.1
+scipy==1.2.0rc2
+six==1.12.0
+torch==1.0.0
+torchvision==0.2.1
