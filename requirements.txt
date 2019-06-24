@@ -8,12 +8,11 @@ parso==0.5.0
 pexpect==4.7.0
 pickleshare==0.7.5
 Pillow==6.0.0
-pkg-resources==0.0.0
 prompt-toolkit==2.0.9
 ptyprocess==0.6.0
 Pygments==2.4.2
 python-Levenshtein==0.12.0
--e git+git@github.com:gchrupala/rascal.git@5a0452245bae957508574188fa2be2c4142038c7#egg=rascal
+-e git+git@github.com:gchrupala/rascal.git@84c51a13818f4842d21c795c8020ccdacec2fe53#egg=rascal
 scikit-learn==0.20.1
 scipy==1.2.0rc2
 six==1.12.0
