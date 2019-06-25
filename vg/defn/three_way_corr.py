@@ -61,12 +61,36 @@ class SpeechCorrText(nn.Module):
         self.config = config
         self.SpeechEncoderBottom = speech_encoder
         self.SpeechEncoderTop = SpeechEncoderTop(**config['SpeechEncoderTop'])
-#        self.CorrEncoder = nn.Linear(1024, 1024)
+        self.CorrEncoder = ImageEncoder(size=1024, size_target=1024*4)
         self.optimizer = optim.Adam(self.parameters(), lr=config['lr'])
 
     def cost(self, speech, simembed):
         speech_enc = self.SpeechEncoderTop(self.SpeechEncoderBottom(speech))
-        scores = loss.cosine_matrix(speech_enc, simembed) 
+        embed_enc = self.CorrEncoder(simembed)
+        scores = loss.cosine_matrix(speech_enc, embed_enc) 
+        cost =  loss.contrastive(scores, margin=self.config['margin_size'])
+        return cost     
+
+        
+    def args(self, item):
+        return (item['audio'], item['simembed'])
+
+    def test_cost(self, *args):
+        return self.cost(*args)
+
+class SpeechBareCorrText(nn.Module):
+
+    def __init__(self, speech_encoder, config):
+        super(SpeechBareCorrText, self).__init__()
+        self.config = config
+        self.SpeechEncoderBottom = speech_encoder
+        self.SpeechEncoderTop = SpeechEncoderTop(**config['SpeechEncoderTop'])
+        self.optimizer = optim.Adam(self.parameters(), lr=config['lr'])
+
+    def cost(self, speech, simembed):
+        speech_enc = self.SpeechEncoderTop(self.SpeechEncoderBottom(speech))
+        embed_enc = simembed
+        scores = loss.cosine_matrix(speech_enc, embed_enc) 
         cost =  loss.contrastive(scores, margin=self.config['margin_size'])
         return cost     
 
@@ -144,7 +168,7 @@ class Net(nn.Module):
                                 if config.get('TextEncoderBottom') else None
         self.SpeechText  = SpeechText(self.SpeechEncoderBottom, self.TextEncoderBottom, config['SpeechText'])  \
                                 if config.get('SpeechText') else None
-        self.SpeechCorrText = SpeechCorrText(self.SpeechEncoderBottom, config['SpeechCorrText']) \
+        self.SpeechCorrText = SpeechBareCorrText(self.SpeechEncoderBottom, config['SpeechCorrText']) \
                                 if config.get('SpeechCorrText') else None
         self.SpeechImage = SpeechImage(self.SpeechEncoderBottom, config['SpeechImage'])
         self.TextImage   = TextImage(self.TextEncoderBottom, config['TextImage']) \

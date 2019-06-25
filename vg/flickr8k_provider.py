@@ -43,14 +43,26 @@ class Provider:
                 sentence['speaker'] = "flickr8k_" + W2S[uttid]
                 self.speakers.add(sentence['speaker'])
 
-  def embedBySim(self, size=1024):
+  def makeSimEmbed(self, size=1024):
     from vg.scorer import stringsim
     ref = random.sample(list(self._iterSentences(split='train')), size)
+    emb = []
     for image in self.dataset['images']:
       for sent in image['sentences']:
-        sent['simembed'] = np.array([stringsim(sent['raw'], ref_i['raw']) for  ref_i in ref ])
-    
+        emb.append(np.array([stringsim(sent['raw'], ref_i['raw']) for  ref_i in ref ]))
+    np.save("{}/data/flickr8k/flickr8k_simembed-{}.npy".format(self.root, size), np.array(emb, dtype='float32'))
 
+  def embedBySim(self, size=1024):
+    try:
+      emb = np.load("{}/data/flickr8k/flickr8k_simembed-{}.npy".format(self.root, size))
+    except FileNotFoundError:
+      self.makeSimEmbed(size=size)
+      emb = np.load("{}/data/flickr8k/flickr8k_simembed-{}.npy".format(self.root, size))
+    j = 0
+    for image in self.dataset['images']:
+      for sent in image['sentences']:
+        sent['simembed'] = emb[j,:]
+        j += 1
     
   def _iterImages(self, split):
         for image in self.dataset['images']:

@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='rascal',
-      version='0.4',
+      version='0.5',
       description='Visually grounded speech with inductive biases',
       url='https://github.com/gchrupala/vgs',
       author='Grzegorz Chrupała',
